@@ -11,10 +11,12 @@
   --color-dark-lighter: #eddc91;
   --color-dark-light: #ceaf6f;
 
-  --color-light-darkest: #eceff4;
-  --color-light-secondary: #d8dee9;
-  --color-light-text: #2e3440;
-  --color-light-light: #88c0d0;
+  --color-light-black: #d1d5db;
+  --color-light-darkest: #f9fafb;
+  --color-light-secondary: #e5e7eb;
+  --color-light-light: #d8dee9;
+  --color-light-lighter: #bfdbfe;
+  --color-light-text: #1f2937;
 }
 
 @utility smooth-transition {
