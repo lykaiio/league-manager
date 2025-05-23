@@ -5,6 +5,13 @@ const App = () => {
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
+  const accounts = [
+    {
+      imageSrc: "Silver.webp",
+      text: "admasmdmasdm",
+    },
+  ];
+
   const ThemedButton = ({ text }) => (
     <button
       className={`smooth-transition px-8 py-2 font-bold border-2 shadow flex-shrink-0 ${
@@ -16,6 +23,27 @@ const App = () => {
       {text}
     </button>
   );
+
+  const AccountCard = ({ imageSrc, text }) => {
+    return (
+      <div className="rounded-2xl text-white flex flex-col md:flex-row gap-4 h-full">
+        <div className="w-full md:w-auto md:max-w-[300px] max-h-60 overflow-hidden rounded-2xl">
+          <img
+            src={imageSrc}
+            alt="rank"
+            className="object-cover w-full h-full rounded-2xl"
+          />
+        </div>
+        <div
+          className={`flex-1 overflow-y-auto py-2 smooth-transition ${
+            isDarkMode ? "text-dark-text" : "text-light-text"
+          }`}
+        >
+          {text}
+        </div>
+      </div>
+    );
+  };
 
   const ThemedInput = ({ placeholder, type = "text" }) => (
     <input
@@ -91,10 +119,20 @@ const App = () => {
 
         <div className="relative w-full mt-4">
           <div
-            className={`absolute left-0 right-4 rounded-2xl h-screen shadow ${
+            className={`p-4 absolute left-0 right-4 rounded-2xl h-screen shadow ${
               isDarkMode ? "bg-dark-black" : "bg-light-secondary"
             }`}
-          ></div>
+          >
+            <div className="grid grid-cols-1 gap-4">
+              {accounts.map((account, index) => (
+                <AccountCard
+                  key={index}
+                  imageSrc={account.imageSrc}
+                  text={account.text}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
