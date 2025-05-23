@@ -1,10 +1,20 @@
 import { useState } from "react";
+import AccountCard from "./components/AccountCard";
+import ThemedInput from "./components/ThemedInput";
+import ThemedSelect from "./components/ThemedSelect";
+import ThemedButton from "./components/ThemedButton";
 
 const App = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
-  const accounts = [
+  const [newLogin, setNewLogin] = useState("");
+  const [newRiotId, setNewRiotId] = useState("");
+  const [newTag, setNewTag] = useState("");
+  const [newRegion, setNewRegion] = useState("NA");
+  const [newPassword, setNewPassword] = useState("");
+
+  const [accounts, setAccounts] = useState([
     {
       imageSrc: "Silver.webp",
       riotId: "ShadowAssassin#NA1",
@@ -32,129 +42,36 @@ const App = () => {
       lp: "12 LP",
       winRate: "71%",
     },
-  ];
+  ]);
 
-  const ThemedInput = ({ placeholder, type = "text" }) => (
-    <input
-      type={type}
-      placeholder={placeholder}
-      className={`smooth-transition font-sans p-2 border-2 flex-grow shadow rounded ${
-        isDarkMode
-          ? "bg-dark-secondary text-dark-text border-dark-light"
-          : "bg-light-secondary text-light-text border-light-black"
-      }`}
-    />
-  );
+  const addAccount = () => {
+    if (!newLogin || !newRiotId || !newTag || !newPassword) return;
 
-  const ThemedSelect = ({ options = [] }) => (
-    <div className="relative">
-      <select
-        className={`appearance-none w-full font-sans p-2 border-2 shadow rounded smooth-transition pr-8 ${
-          isDarkMode
-            ? "bg-dark-secondary text-dark-text border-dark-light"
-            : "bg-light-secondary text-light-text border-light-black"
-        }`}
-      >
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
-      <div className="pointer-events-none absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400">
-        ▼
-      </div>
-    </div>
-  );
+    const newAccount = {
+      imageSrc: "Unranked.webp",
+      riotId: `${newRiotId}#${newTag}`,
+      login: newLogin,
+      password: newPassword,
+      rank: "Unranked",
+      lp: "0 LP",
+      winRate: "0%",
+    };
 
-  const handleCopy = (text) => {
-    navigator.clipboard.writeText(text);
-    alert(`Copied: ${text}`);
+    setAccounts([...accounts, newAccount]);
+    setNewLogin("");
+    setNewRiotId("");
+    setNewTag("");
+    setNewRegion("NA");
+    setNewPassword("");
   };
 
-  const CopyButton = ({ label, value }) => (
-    <div className="flex items-center space-x-2">
-      <button
-        onClick={() => handleCopy(value)}
-        className={`text-sm px-3 py-1 border rounded font-medium smooth-transition ${
-          isDarkMode
-            ? "bg-dark-secondary text-dark-text border-dark-light hover:bg-dark-light"
-            : "bg-light-light text-light-text border-light-black hover:bg-light-darkest"
-        }`}
-      >
-        {label}
-      </button>
-    </div>
-  );
+  const handleCopy = (text) => navigator.clipboard.writeText(text);
 
-  const AccountCard = ({
-    imageSrc,
-    riotId,
-    login,
-    password,
-    rank,
-    lp,
-    winRate,
-  }) => {
-    return (
-      <div className="rounded-2xl text-white flex flex-col md:flex-row gap-4 h-full mb-4 p-4 bg-opacity-60 backdrop-blur-lg border border-gray-700">
-        <div className="w-full md:w-auto md:max-w-[200px] max-h-48 overflow-hidden rounded-2xl">
-          <img
-            src={imageSrc}
-            alt="rank"
-            className="object-cover w-full h-full rounded-2xl"
-          />
-        </div>
-        <div
-          className={`flex-1 overflow-y-auto smooth-transition space-y-2 ${
-            isDarkMode ? "text-dark-text" : "text-light-text"
-          }`}
-        >
-          <div className="space-y-1">
-            <p className="text-lg font-bold">{riotId}</p>
-            <CopyButton label="Copy Login" value={login} />
-            <CopyButton label="Copy Password" value={password} />
-          </div>
-
-          <div className="border-t border-gray-600 pt-2 mt-2">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-md font-semibold">{rank}</p>
-                <p className="text-sm opacity-75">{lp}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm opacity-75">Win Rate</p>
-                <p
-                  className={`text-md font-semibold ${
-                    parseInt(winRate) >= 60
-                      ? "text-green-400"
-                      : parseInt(winRate) >= 50
-                      ? "text-yellow-400"
-                      : "text-red-400"
-                  }`}
-                >
-                  {winRate}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  const handleDelete = (index) => {
+    if (window.confirm("Are you sure you want to delete this account?")) {
+      setAccounts((prev) => prev.filter((_, i) => i !== index));
+    }
   };
-
-  const ThemedButton = ({ text, onClick }) => (
-    <button
-      onClick={onClick}
-      className={`smooth-transition px-8 py-2 font-bold border-2 shadow flex-shrink-0 rounded ${
-        isDarkMode
-          ? "bg-dark-secondary border-dark-light text-dark-text hover:bg-gradient-to-t hover:from-cyan-400/50 hover:via-blue-500/10 hover:to-transparent hover:backdrop-blur-lg hover:shadow-2xl hover:shadow-cyan-500/5"
-          : "bg-light-light border-light-black text-light-text"
-      }`}
-    >
-      {text}
-    </button>
-  );
 
   return (
     <div
@@ -170,15 +87,15 @@ const App = () => {
           <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-cyan-400/25 via-blue-500/10 to-transparent backdrop-blur-lg z-10 pointer-events-none animate-pulse shadow-2xl shadow-cyan-500/5" />
         </>
       )}
-
       <div className="absolute inset-0 ring-inset ring-2 ring-black/20 pointer-events-none z-10" />
 
       <div className="relative z-20 flex justify-end mb-4 space-x-4">
         <ThemedButton
           text={isDarkMode ? "🌑 Dark" : "🌕 Light"}
           onClick={toggleTheme}
+          isDarkMode={isDarkMode}
         />
-        <ThemedButton text="⟳" />
+        <ThemedButton text="⟳" onClick={() => {}} isDarkMode={isDarkMode} />
       </div>
 
       <div className="pl-4 flex flex-row items-center space-x-4 mb-2">
@@ -201,9 +118,25 @@ const App = () => {
 
       <div className="relative z-20 pl-4 flex flex-col justify-start items-start space-y-2">
         <div className="flex flex-wrap gap-2 w-full">
-          <ThemedInput placeholder="Username Login" />
-          <ThemedInput placeholder="Riot ID" />
-          <ThemedInput placeholder="#Tag" />
+          <ThemedInput
+            placeholder="Username Login"
+            value={newLogin}
+            onChange={(e) => setNewLogin(e.target.value)}
+            isDarkMode={isDarkMode}
+          />
+          <ThemedInput
+            placeholder="Riot ID"
+            value={newRiotId}
+            onChange={(e) => setNewRiotId(e.target.value)}
+            isDarkMode={isDarkMode}
+          />
+          <ThemedInput
+            placeholder="#Tag"
+            value={newTag}
+            onChange={(e) => setNewTag(e.target.value.replace("#", ""))}
+            onKeyDown={(e) => e.key === "#" && e.preventDefault()}
+            isDarkMode={isDarkMode}
+          />
           <ThemedSelect
             options={[
               "NA",
@@ -217,12 +150,22 @@ const App = () => {
               "RU",
               "JP",
             ]}
+            value={newRegion}
+            onChange={(e) => setNewRegion(e.target.value)}
+            isDarkMode={isDarkMode}
           />
-        </div>
-
-        <div className="flex flex-wrap gap-2 w-full">
-          <ThemedInput placeholder="Password" type="password" />
-          <ThemedButton text="Add" />
+          <ThemedInput
+            placeholder="Password"
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            isDarkMode={isDarkMode}
+          />
+          <ThemedButton
+            text="Add"
+            onClick={addAccount}
+            isDarkMode={isDarkMode}
+          />
         </div>
 
         <div className="relative w-full mt-4">
@@ -232,19 +175,29 @@ const App = () => {
             }`}
             style={{ width: "calc(100% - 1rem)" }}
           >
-            <div className="grid grid-cols-1 gap-4">
-              {accounts.map((account, index) => (
-                <AccountCard
-                  key={index}
-                  imageSrc={account.imageSrc}
-                  riotId={account.riotId}
-                  login={account.login}
-                  password={account.password}
-                  rank={account.rank}
-                  lp={account.lp}
-                  winRate={account.winRate}
-                />
-              ))}
+            <div className="grid grid-cols-1 gap-4 h-full min-h-[16rem]">
+              {accounts.length > 0 ? (
+                accounts.map((account, index) => (
+                  <AccountCard
+                    key={index}
+                    {...account}
+                    index={index}
+                    handleDelete={handleDelete}
+                    handleCopy={handleCopy}
+                    isDarkMode={isDarkMode}
+                  />
+                ))
+              ) : (
+                <div className="flex justify-center items-center h-full py-8">
+                  <p
+                    className={`text-xl font-semibold ${
+                      isDarkMode ? "text-dark-text" : "text-light-text"
+                    }`}
+                  >
+                    Add an account!
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
