@@ -8,7 +8,30 @@ const App = () => {
   const accounts = [
     {
       imageSrc: "Silver.webp",
-      text: "admasmdmasdm",
+      riotId: "ShadowAssassin#NA1",
+      login: "shadow_main_2019",
+      password: "••••••••••••",
+      rank: "Silver III",
+      lp: "47 LP",
+      winRate: "64%",
+    },
+    {
+      imageSrc: "Gold.webp",
+      riotId: "DragonSlayer#EUW",
+      login: "dragonkiller99",
+      password: "••••••••••••",
+      rank: "Gold II",
+      lp: "73 LP",
+      winRate: "58%",
+    },
+    {
+      imageSrc: "Platinum.webp",
+      riotId: "MidLaneGod#KR",
+      login: "yasuo_main_kr",
+      password: "••••••••••••",
+      rank: "Platinum IV",
+      lp: "12 LP",
+      winRate: "71%",
     },
   ];
 
@@ -24,10 +47,18 @@ const App = () => {
     </button>
   );
 
-  const AccountCard = ({ imageSrc, text }) => {
+  const AccountCard = ({
+    imageSrc,
+    riotId,
+    login,
+    password,
+    rank,
+    lp,
+    winRate,
+  }) => {
     return (
-      <div className="rounded-2xl text-white flex flex-col md:flex-row gap-4 h-full">
-        <div className="w-full md:w-auto md:max-w-[300px] max-h-60 overflow-hidden rounded-2xl">
+      <div className="rounded-2xl text-white flex flex-col md:flex-row gap-4 h-full mb-4">
+        <div className="w-full md:w-auto md:max-w-[200px] max-h-48 overflow-hidden rounded-2xl">
           <img
             src={imageSrc}
             alt="rank"
@@ -35,11 +66,38 @@ const App = () => {
           />
         </div>
         <div
-          className={`flex-1 overflow-y-auto py-2 smooth-transition ${
+          className={`flex-1 overflow-y-auto py-2 smooth-transition space-y-2 ${
             isDarkMode ? "text-dark-text" : "text-light-text"
           }`}
         >
-          {text}
+          <div className="space-y-1">
+            <p className="text-lg font-bold">{riotId}</p>
+            <p className="text-sm opacity-75">Login: {login}</p>
+            <p className="text-sm opacity-75">Password: {password}</p>
+          </div>
+
+          <div className="border-t border-gray-600 pt-2 mt-2">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-md font-semibold">{rank}</p>
+                <p className="text-sm opacity-75">{lp}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm opacity-75">Win Rate</p>
+                <p
+                  className={`text-md font-semibold ${
+                    parseInt(winRate) >= 60
+                      ? "text-green-400"
+                      : parseInt(winRate) >= 50
+                      ? "text-yellow-400"
+                      : "text-red-400"
+                  }`}
+                >
+                  {winRate}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -108,7 +166,7 @@ const App = () => {
       <div className="relative z-20 pl-4 flex flex-col justify-start items-start space-y-2">
         <div className="flex w-9/10 flex-row space-x-2">
           <ThemedInput placeholder="Username Login" />
-          <ThemedInput placeholder="Riot" />
+          <ThemedInput placeholder="Riot ID" />
           <ThemedInput placeholder="#Tag" />
         </div>
 
@@ -119,16 +177,22 @@ const App = () => {
 
         <div className="relative w-full mt-4">
           <div
-            className={`p-4 absolute left-0 right-4 rounded-2xl h-screen shadow ${
+            className={`p-4 rounded-2xl shadow max-h-96 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-300 ${
               isDarkMode ? "bg-dark-black" : "bg-light-secondary"
             }`}
+            style={{ width: "calc(100% - 1rem)" }}
           >
             <div className="grid grid-cols-1 gap-4">
               {accounts.map((account, index) => (
                 <AccountCard
                   key={index}
                   imageSrc={account.imageSrc}
-                  text={account.text}
+                  riotId={account.riotId}
+                  login={account.login}
+                  password={account.password}
+                  rank={account.rank}
+                  lp={account.lp}
+                  winRate={account.winRate}
                 />
               ))}
             </div>
