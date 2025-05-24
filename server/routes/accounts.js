@@ -5,7 +5,7 @@ import { getDB } from "../db/database.js";
 
 const router = express.Router();
 
-// Get all accounts - THIS WAS MISSING!
+// Get all accounts
 router.get("/", async (req, res) => {
   try {
     const db = getDB();
