@@ -371,7 +371,7 @@ const App = () => {
 
           {/* Tag input field (part after the #) - automatically removes # symbol */}
           <ThemedInput
-            placeholder="Tag"
+            placeholder="#Tag"
             value={newTag}
             onChange={(e) => setNewTag(e.target.value.replace("#", ""))}
             onKeyDown={(e) => e.key === "#" && e.preventDefault()}
