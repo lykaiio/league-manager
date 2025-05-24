@@ -15,6 +15,7 @@ const App = () => {
   const [newTag, setNewTag] = useState("");
   const [newRegion, setNewRegion] = useState("NA");
   const [newPassword, setNewPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const [accounts, setAccounts] = useState([]);
 
@@ -22,7 +23,6 @@ const App = () => {
     axios
       .get("http://localhost:4000/api/accounts")
       .then((res) => {
-        console.log("GET /api/accounts response:", res.data); // log the data
         setAccounts(res.data);
       })
       .catch((err) => {
@@ -47,12 +47,7 @@ const App = () => {
     axios
       .post("http://localhost:4000/api/accounts", newAccount)
       .then((res) => {
-        const accountData = res.data;
-        if (!Array.isArray(accounts)) {
-          console.error("Expected accounts to be an array", accounts);
-          return;
-        }
-        setAccounts([...accounts, accountData]);
+        setAccounts([...accounts, res.data]);
         setNewLogin("");
         setNewRiotId("");
         setNewTag("");
@@ -65,8 +60,14 @@ const App = () => {
   };
 
   const handleCopy = (text, isPassword = false) => {
-    const value = isPassword ? decrypt(text) : text;
-    navigator.clipboard.writeText(value);
+    try {
+      const value = isPassword ? decrypt(text) : text;
+      if (!value) throw new Error("Nothing to copy");
+      navigator.clipboard.writeText(value);
+    } catch (err) {
+      console.error("Copy failed:", err);
+      alert("Failed to copy value");
+    }
   };
 
   const handleDelete = (id) => {
@@ -86,7 +87,6 @@ const App = () => {
     axios
       .get("http://localhost:4000/api/accounts/refresh")
       .then((res) => {
-        console.log("Refreshed account data:", res.data);
         setAccounts(res.data);
       })
       .catch((err) => {
@@ -96,7 +96,7 @@ const App = () => {
 
   return (
     <div
-      className={`relative smooth-transition p-4 min-h-screen w-full ${
+      className={`relative smooth-transition p-4 h-screen w-full flex flex-col justify-between overflow-hidden ${
         isDarkMode
           ? "bg-gradient-to-t from-dark-darkest to-dark-black"
           : "bg-gradient-to-t from-light-secondary to-light-darkest"
@@ -111,16 +111,13 @@ const App = () => {
       <div className="absolute inset-0 ring-inset ring-2 ring-black/20 pointer-events-none z-10" />
 
       <div className="relative px-4 z-20 flex justify-between items-center mb-4">
-        <div>
-          <p
-            className={`smooth-transition text-3xl font-sans font-bold ${
-              isDarkMode ? "text-dark-text" : "text-light-text"
-            }`}
-          >
-            Distort
-          </p>
-        </div>
-
+        <p
+          className={`smooth-transition text-3xl font-sans font-bold ${
+            isDarkMode ? "text-dark-text" : "text-light-text"
+          }`}
+        >
+          Distort
+        </p>
         <div className="flex space-x-4">
           <ThemedButton
             text={isDarkMode ? "🌑 Dark" : "🌕 Light"}
@@ -135,7 +132,15 @@ const App = () => {
         </div>
       </div>
 
-      <div className="relative z-20 px-4 flex flex-col justify-start items-start space-y-2">
+      <div className="relative z-20 px-4 flex flex-col justify-start items-start space-y-4 flex-shrink-0">
+        <p
+          className={`text-xl font-semibold ${
+            isDarkMode ? "text-dark-text" : "text-light-text"
+          }`}
+        >
+          Add Account
+        </p>
+
         <div className="flex flex-wrap gap-2 w-full">
           <ThemedInput
             placeholder="Username Login"
@@ -173,52 +178,78 @@ const App = () => {
             onChange={(e) => setNewRegion(e.target.value)}
             isDarkMode={isDarkMode}
           />
-          <ThemedInput
-            placeholder="Password"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            isDarkMode={isDarkMode}
-          />
+          <div className="relative flex flex-grow w-full sm:w-auto">
+            <ThemedInput
+              placeholder="Password"
+              type={showPassword ? "text" : "password"}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              isDarkMode={isDarkMode}
+            />
+            <button
+              onClick={() => setShowPassword((prev) => !prev)}
+              className={`absolute right-2 top-1/2 transform -translate-y-1/2 text-sm ${
+                isDarkMode ? "text-gray-400" : "text-gray-700"
+              }`}
+              title="Toggle Password"
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </button>
+          </div>
           <ThemedButton
             text="Add"
             onClick={addAccount}
             isDarkMode={isDarkMode}
           />
         </div>
+      </div>
 
-        <div className="relative w-full mt-4">
-          <div
-            className={`p-4 rounded-2xl shadow max-h-96 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-300 ${
-              isDarkMode ? "bg-dark-black" : "bg-light-secondary"
-            }`}
-            style={{ width: "calc(100% - 1rem)" }}
-          >
-            <div className="grid grid-cols-1 gap-4 h-full min-h-[16rem]">
-              {accounts.length > 0 ? (
-                accounts.map((account, index) => (
-                  <AccountCard
-                    key={account.id}
-                    {...account}
-                    handleDelete={() => handleDelete(account.id)}
-                    handleCopy={handleCopy}
-                    isDarkMode={isDarkMode}
-                  />
-                ))
-              ) : (
-                <div className="flex justify-center items-center h-full py-8">
-                  <p
-                    className={`text-xl font-semibold ${
-                      isDarkMode ? "text-dark-text" : "text-light-text"
-                    }`}
-                  >
-                    Add an account!
-                  </p>
-                </div>
-              )}
-            </div>
+      <div className="relative z-20 px-4 pt-4 flex-grow overflow-hidden">
+        <div
+          className={`p-4 rounded-2xl shadow h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-300 ${
+            isDarkMode ? "bg-dark-black" : "bg-light-secondary"
+          }`}
+        >
+          <div className="grid grid-cols-1 gap-4 min-h-[16rem]">
+            {accounts.length > 0 ? (
+              accounts.map((account) => (
+                <AccountCard
+                  key={account.id}
+                  {...account}
+                  handleDelete={() => handleDelete(account.id)}
+                  handleCopy={handleCopy}
+                  isDarkMode={isDarkMode}
+                />
+              ))
+            ) : (
+              <div className="flex justify-center items-center h-full py-8">
+                <p
+                  className={`text-xl font-semibold ${
+                    isDarkMode ? "text-dark-text" : "text-light-text"
+                  }`}
+                >
+                  Add an account!
+                </p>
+              </div>
+            )}
           </div>
         </div>
+      </div>
+
+      <div className="relative z-20 px-4 mt-4 flex justify-between items-end w-full flex-shrink-0">
+        <p className="text-xs font-bold text-green-500">
+          Not affiliated with Riot Games.
+        </p>
+        <button
+          className="text-xs text-green-500 hover:underline"
+          onClick={() =>
+            alert(
+              "All account data is stored locally on your device. Passwords and login information are not sent to any server. Only rank and winrate data are fetched online."
+            )
+          }
+        >
+          ℹ️ Info
+        </button>
       </div>
     </div>
   );

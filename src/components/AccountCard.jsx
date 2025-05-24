@@ -46,6 +46,7 @@ const AccountCard = ({
           label="Copy Password"
           value={password}
           isDarkMode={isDarkMode}
+          isPassword={true}
           handleCopy={handleCopy}
         />
       </div>
